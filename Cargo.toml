@@ -1,0 +1,25 @@
+[workspace]
+members = [
+    "./types",
+    "./program",
+]
+
+[package]
+name = "synth"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "synth"
+path = "main.rs"
+
+[dependencies]
+types = { path = "./types" }
+
+anyhow = "1"
+libloading = "0.8"
+inotify = { version = "0.10", default-features = false }
+# dasp = "0.11"
+jack = "0.11"
+midir = "0.9"
+spin = "0.9"
