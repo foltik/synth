@@ -1,2 +1,2 @@
 mod osc;
-pub use osc::Oscillator;
+pub use osc::Osc;

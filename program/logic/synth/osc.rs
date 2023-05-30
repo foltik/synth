@@ -4,38 +4,33 @@ use crate::utils::sound::Note;
 use crate::utils::synth::Waveform;
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct Oscillator {
+pub struct Osc {
     pub waveform: Waveform,
+
     pub amp: f64,
     pub phase: f64,
-    pub detune: f64,
+    pub tune: f64,
 
-    pub t: f64,
-    pub t0: f64,
+    pub phi: f64,
 }
 
-impl Default for Oscillator {
+impl Default for Osc {
     fn default() -> Self {
         Self {
             waveform: default(),
             amp: 1.0,
             phase: 0.0,
-            detune: 0.0,
-
-            t: 0.0,
-            t0: 0.0,
+            tune: 0.0,
+            phi: 0.0,
         }
     }
 }
 
-impl Oscillator {
-    pub fn sample(&mut self, t: f64, note: Note) -> f64 {
-        let dt = t - self.t;
-        self.t = t;
+impl Osc {
+    pub fn sample(&mut self, dt: f64, note: Note) -> f64 {
+        let freq = note.detune(self.tune).freq();
+        self.phi += dt * freq;
 
-        let freq = note.detune(self.detune).freq();
-
-        self.t0 += dt * freq;
-        self.waveform.sample(self.t0) * self.amp
+        self.waveform.sample(self.phi + self.phase) * self.amp
     }
 }

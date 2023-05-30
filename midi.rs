@@ -288,20 +288,20 @@ mod launch_control_xl {
             Some(match raw[0] & 0xf0 {
                 0x90 => {
                     match raw[1] {
-                        0x29..=0x2c => Input::Button(1, raw[1] as i8 - 0x29, true),
-                        0x39..=0x3c => Input::Button(1, 4 + raw[1] as i8 - 0x39, true),
-                        0x49..=0x4c => Input::Button(0, raw[1] as i8 - 0x49, true),
-                        0x59..=0x5c => Input::Button(0, 4 + raw[1] as i8 - 0x59, true),
+                        0x29..=0x2c => Input::Button(raw[1] as i8 - 0x29, 1, true),
+                        0x39..=0x3c => Input::Button(4 + raw[1] as i8 - 0x39, 1, true),
+                        0x49..=0x4c => Input::Button(raw[1] as i8 - 0x49, 0, true),
+                        0x59..=0x5c => Input::Button(4 + raw[1] as i8 - 0x59, 0, true),
                         0x69..=0x6c => Input::Select(3 - (raw[1] as i8 - 0x69), true),
                         _ => return None,
                     }
                 },
                 0x80 => {
                     match raw[1] {
-                        0x29..=0x2c => Input::Button(1, raw[1] as i8 - 0x29, false),
-                        0x39..=0x3c => Input::Button(1, 4 + raw[1] as i8 - 0x39, false),
-                        0x49..=0x4c => Input::Button(0, raw[1] as i8 - 0x49, false),
-                        0x59..=0x5c => Input::Button(0, 4 + raw[1] as i8 - 0x59, false),
+                        0x29..=0x2c => Input::Button(raw[1] as i8 - 0x29, 1, false),
+                        0x39..=0x3c => Input::Button(4 + raw[1] as i8 - 0x39, 1, false),
+                        0x49..=0x4c => Input::Button(raw[1] as i8 - 0x49, 0, false),
+                        0x59..=0x5c => Input::Button(4 + raw[1] as i8 - 0x59, 0, false),
                         0x69..=0x6c => Input::Select(3 - (raw[1] as i8 - 0x69), false),
                         _ => return None,
                     }

@@ -23,29 +23,33 @@ mod logic;
 #[serde(default)]
 pub struct Program {
     piano: logic::pad::Piano,
-    osc0: synth::Oscillator,
-    osc1: synth::Oscillator,
-    osc2: synth::Oscillator,
+    osc0: synth::Osc,
+    osc1: synth::Osc,
+    osc2: synth::Osc,
     volume: f64,
+
+    t: f64,
 }
 
 impl Default for Program {
     fn default() -> Self {
         Self {
             piano: default(),
-            osc0: synth::Oscillator {
-                waveform: Waveform::Saw,
+            osc0: synth::Osc {
+                waveform: Waveform::Sine,
                 ..default()
             },
-            osc1: synth::Oscillator {
-                waveform: Waveform::Saw,
+            osc1: synth::Osc {
+                waveform: Waveform::Tri,
                 ..default()
             },
-            osc2: synth::Oscillator {
+            osc2: synth::Osc {
                 waveform: Waveform::Saw,
                 ..default()
             },
             volume: 0.01,
+
+            t: 0.0,
         }
     }
 }
@@ -72,16 +76,16 @@ impl Program {
         println!("{input:?}");
         match input {
             Input::Knob(x, y, f) => match (x, y) {
-                (0, 0) => self.osc0.detune = f,
-                (1, 0) => self.osc1.detune = f,
-                (2, 0) => self.osc2.detune = f,
+                (0, 0) => self.osc0.tune = f,
+                (0, 1) => self.osc1.tune = f,
+                (0, 2) => self.osc2.tune = f,
 
-                (0, 0) => self.osc0.detune = f * 12.0,
-                (1, 0) => self.osc1.detune = f * 12.0,
-                (2, 0) => self.osc2.detune = f * 12.0,
+                (1, 0) => self.osc0.tune = f * 12.0,
+                (1, 1) => self.osc1.tune = f * 12.0,
+                (1, 2) => self.osc2.tune = f * 12.0,
 
-                (0, 2) => self.osc0.phase = f.mapf(),
-                (1, 2) => self.osc1.phase = f.mapf(),
+                (2, 0) => self.osc0.phase = f.mapf(),
+                (2, 1) => self.osc1.phase = f.mapf(),
                 (2, 2) => self.osc2.phase = f.mapf(),
                 _ => {},
             },
@@ -99,12 +103,15 @@ impl Program {
     pub fn ctrl_out(&mut self, t: f64) -> lcx::Output { lcx::clear() }
 
     pub fn sample(&mut self, t: f64) -> (f64, f64) {
+        let dt = t - self.t;
+        self.t = t;
+
         let mut f = 0.0;
 
         for (note, v) in self.piano.notes() {
-            f += self.osc0.sample(t, note) * v;
-            f += self.osc1.sample(t, note) * v;
-            f += self.osc2.sample(t, note) * v;
+            f += self.osc0.sample(dt, note) * 1.0;
+            f += self.osc1.sample(dt, note) * 1.0;
+            f += self.osc2.sample(dt, note) * 1.0;
         }
 
         f *= self.volume;
